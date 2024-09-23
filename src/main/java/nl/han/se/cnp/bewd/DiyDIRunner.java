@@ -6,6 +6,7 @@ import nl.han.se.cnp.bewd.annotations.DiyRestController;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,6 +37,10 @@ public class DiyDIRunner {
 
     private static final String PACKAGE_TO_SCAN = "nl.han.se.cnp.bewd";
 
+    // Create a new instance of Reflections. This is a helper class that is able
+    // to find classes and their methods.
+    private final Reflections ref = new Reflections(PACKAGE_TO_SCAN);
+
     public static void main(String[] args) {
         var runner = new DiyDIRunner();
         runner.runDiyApplication();
@@ -54,13 +59,7 @@ public class DiyDIRunner {
                 scanForGetMethodsAndCall(instance);
             }
 
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }
@@ -68,20 +67,13 @@ public class DiyDIRunner {
     private Set<Class<?>> findAllRESTClasses(final String packageToScan) {
         System.out.println("Scanning for classes...");
 
-        // Create a new instance of Reflections. This is a helper class that is able
-        // to find classes and their methods.
-        var ref = new Reflections(packageToScan);
-
         // Get all classes annotated with @DiyPath. This will gather
         // all classes in "packageToScan" for classes annotated with "DiyPath".
         var restClasses = ref.getTypesAnnotatedWith(DiyRestController.class);
 
         // Print info on all found classes. Just for convenience...
         for (Class<?> clazz : restClasses) {
-            var path = clazz.getAnnotation(DiyRestController.class);
-
-            System.out.printf("Found DIY REST Class: %s\n",
-                    clazz.getSimpleName());
+            System.out.printf("Found DIY REST Class: %s\n", clazz.getSimpleName());
         }
 
         return restClasses;
@@ -128,9 +120,12 @@ public class DiyDIRunner {
                 // We assume the method has exactly one parameter
                 var classOfParameter = parameterTypes[0];
 
-                // Again we create an instance through the constructor
-                var constructorOfDependency = classOfParameter.getConstructor();
-                var instanceOfDependency = constructorOfDependency.newInstance(new Object[]{});
+                // We now need to find the implementation that needs to be injected
+                var implementingClass = new ArrayList<>(ref.getSubTypesOf(classOfParameter)).getFirst();
+
+                // Then we create an instance of the implementation through the constructor
+                var constructorOfDependency = implementingClass.getConstructor();
+                var instanceOfDependency = constructorOfDependency.newInstance();
 
                 // In this case, we pass the dependency as the second argument of the invoke method
                 method.invoke(instance, instanceOfDependency);
