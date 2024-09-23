@@ -1,7 +1,7 @@
 package nl.han.se.cnp.bewd.resources;
 
-import nl.han.se.cnp.bewd.annotations.DiyGetMapping;
 import nl.han.se.cnp.bewd.annotations.DiyAutowired;
+import nl.han.se.cnp.bewd.annotations.DiyGetMapping;
 import nl.han.se.cnp.bewd.annotations.DiyRestController;
 import nl.han.se.cnp.bewd.services.ItemService;
 import nl.han.se.cnp.bewd.services.dto.ItemDTO;
