@@ -9,17 +9,19 @@ import nl.han.se.cnp.bewd.services.dto.ItemDTO;
 import java.util.List;
 
 @DiyRestController
-public class ItemResource {
-
+public class ItemResource
+{
     private ItemService itemService;
 
     @DiyGetMapping("/items")
-    public List<ItemDTO> getJsonItems() {
+    public List<ItemDTO> getJsonItems()
+    {
         return itemService.getAll();
     }
 
     @DiyAutowired
-    public void setItemService(ItemService itemService) {
+    public void setItemService(ItemService itemService)
+    {
         this.itemService = itemService;
     }
 }

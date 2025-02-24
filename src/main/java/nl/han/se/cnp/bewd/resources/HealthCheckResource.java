@@ -4,10 +4,11 @@ import nl.han.se.cnp.bewd.annotations.DiyGetMapping;
 import nl.han.se.cnp.bewd.annotations.DiyRestController;
 
 @DiyRestController
-public class HealthCheckResource {
-
+public class HealthCheckResource
+{
     @DiyGetMapping("/health")
-    public String healthy() {
+    public String healthy()
+    {
         return "Up & Running";
     }
 }
