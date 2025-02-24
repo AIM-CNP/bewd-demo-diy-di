@@ -9,7 +9,7 @@ import java.util.List;
  * The {@code ItemService} can be used for accessing a {@link List} of {@link ItemDTO} instances, but also
  * for adding instances to and deleting from the {@link List}.
  */
-public class ItemService
+public class ItemService implements _ItemService
 {
     private final List<ItemDTO> items = new ArrayList<>();
 

@@ -36,6 +36,8 @@ public class DiyDIRunner
 {
     private static final String PACKAGE_TO_SCAN = "nl.han.se.cnp.bewd";
 
+    private Reflections ref;
+
     public static void main(String[] args)
     {
         var runner = new DiyDIRunner();
@@ -71,7 +73,7 @@ public class DiyDIRunner
 
         // Create a new instance of Reflections. This is a helper class that is able
         // to find classes and their methods.
-        var ref = new Reflections(DiyDIRunner.PACKAGE_TO_SCAN);
+        ref = new Reflections(DiyDIRunner.PACKAGE_TO_SCAN);
 
         // Get all classes annotated with @DiyPath. This will gather
         // all classes in "packageToScan" for classes annotated with "DiyPath".
@@ -97,7 +99,7 @@ public class DiyDIRunner
         {
             // Get the Constructor from the Class
             var constructor = clazz.getConstructor();
-
+            
             // Use the Constructor to create a new Instance
             var object = constructor.newInstance();
 
@@ -131,11 +133,14 @@ public class DiyDIRunner
                 // Dependency Injection
                 Class<?>[] parameterTypes = method.getParameterTypes();
 
-                // We assume the method has exactly one parameter
+                // We assume the method has exactly one parameter of class type interface
                 var classOfParameter = parameterTypes[0];
 
+                // Find the implementing class of the interface
+                var implementingClassOfParameter = ref.getSubTypesOf(classOfParameter).iterator().next();
+
                 // Again we create an instance through the constructor
-                var constructorOfDependency = classOfParameter.getConstructor();
+                var constructorOfDependency = implementingClassOfParameter.getConstructor();
                 var instanceOfDependency = constructorOfDependency.newInstance();
 
                 // In this case, we pass the dependency as the second argument of the invoke method
